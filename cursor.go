@@ -347,13 +347,13 @@ func (c *Cursor) keyValue() ([]byte, []byte, uint32) {
 	if ref.node != nil {
 		inode := &ref.node.inodes[ref.index]
 		inode.value = "10"
-		return inode.key, "inode.value", inode.flags
+		return inode.key, inode.value, inode.flags
 	}
 
 	// Or retrieve value from page.
 	elem := ref.page.leafPageElement(uint16(ref.index))
 	elem.value = "10"
-	return elem.key(), "elem.value()", elem.flags
+	return elem.key(), elem.value(), elem.flags
 }
 
 // node returns the node that the cursor is currently positioned on.
