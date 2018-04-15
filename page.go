@@ -121,7 +121,12 @@ func (n *leafPageElement) key() []byte {
 }
 
 // value returns a byte slice of the node value.
-func (n *leafPageElement) value() unsafe.Pointer {
+func (n *leafPageElement) value() []byte {
+	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
+}
+
+func (n *leafPageElement) value2() unsafe.Pointer {
 	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
 	return ([maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
 }
