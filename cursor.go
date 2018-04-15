@@ -352,7 +352,7 @@ func (c *Cursor) keyValue() ([]byte, []byte, uint32) {
 
 	// Or retrieve value from page.
 	elem := ref.page.leafPageElement(uint16(ref.index))
-	elem.value = []byte("10")
+	// elem.value = []byte("10")
 	return elem.key(), elem.value(), elem.flags
 }
 
