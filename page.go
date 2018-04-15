@@ -126,11 +126,6 @@ func (n *leafPageElement) value() []byte {
 	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
 }
 
-func (n *leafPageElement) value2() unsafe.Pointer {
-	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
-	return ([maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
-}
-
 // PageInfo represents human readable information about a page.
 type PageInfo struct {
 	ID            int
