@@ -168,6 +168,25 @@ func (c *Cursor) seek(seek []byte) (key []byte, value []byte, flags uint32) {
 	return c.keyValue()
 }
 
+// seek moves the cursor to a given key and returns it.
+// If the key does not exist then the next key is used.
+func (c *Cursor) seek2(seek []byte) (key []byte, value []byte, flags uint32) {
+	_assert(c.bucket.tx.db != nil, "tx closed")
+
+	// Start from root page/node and traverse to correct page.
+	c.stack = c.stack[:0]
+	c.search(seek, c.bucket.root)
+	ref := &c.stack[len(c.stack)-1]
+
+	// If the cursor is pointing to the end of page/node then return nil.
+	if ref.index >= ref.count() {
+		return nil, nil, 0
+	}
+
+	// If this is a bucket then return a nil value.
+	return c.keyValue2()
+}
+
 // first moves the cursor to the first leaf element under the last page in the stack.
 func (c *Cursor) first() {
 	for {
@@ -338,6 +357,24 @@ func (c *Cursor) nsearch(key []byte) {
 
 // keyValue returns the key and value of the current leaf element.
 func (c *Cursor) keyValue() ([]byte, []byte, uint32) {
+	ref := &c.stack[len(c.stack)-1]
+	if ref.count() == 0 || ref.index >= ref.count() {
+		return nil, nil, 0
+	}
+
+	// Retrieve value from node.
+	if ref.node != nil {
+		inode := &ref.node.inodes[ref.index]
+		return inode.key, inode.value, inode.flags
+	}
+
+	// Or retrieve value from page.
+	elem := ref.page.leafPageElement(uint16(ref.index))
+	return elem.key(), elem.value(), elem.flags
+}
+
+// keyValue returns the key and value of the current leaf element.
+func (c *Cursor) keyValue2() ([]byte, []byte, uint32) {
 	ref := &c.stack[len(c.stack)-1]
 	if ref.count() == 0 || ref.index >= ref.count() {
 		return nil, nil, 0
