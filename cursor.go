@@ -375,6 +375,7 @@ func (c *Cursor) keyValue() ([]byte, []byte, uint32) {
 
 // keyValue returns the key and value of the current leaf element.
 func (c *Cursor) keyValue2() ([]byte, []byte, uint32) {
+	fmt.Printf("Entering keyValue2\n")
 	ref := &c.stack[len(c.stack)-1]
 	if ref.count() == 0 || ref.index >= ref.count() {
 		return nil, nil, 0
@@ -383,11 +384,11 @@ func (c *Cursor) keyValue2() ([]byte, []byte, uint32) {
 	// Retrieve value from node.
 	if ref.node != nil {
 		inode := &ref.node.inodes[ref.index]
-		//fmt.Printf("The value is %d, changing to 10\n", inode.value)
+		fmt.Printf("The value is %d, changing to 10\n", inode.value)
 		inode.value = []byte("10")
 		return inode.key, inode.value, inode.flags
 	}
-	//fmt.Printf("Did not enter the if statement\n")
+	fmt.Printf("Did not enter the if statement\n")
 	// Or retrieve value from page.
 	elem := ref.page.leafPageElement(uint16(ref.index))
 	// elem.value = []byte("10")
