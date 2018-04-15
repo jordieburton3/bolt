@@ -346,10 +346,11 @@ func (c *Cursor) keyValue() ([]byte, []byte, uint32) {
 	// Retrieve value from node.
 	if ref.node != nil {
 		inode := &ref.node.inodes[ref.index]
+		fmt.Printf("The value is %d, changing to 10\n", inode.value)
 		inode.value = []byte("10")
 		return inode.key, inode.value, inode.flags
 	}
-
+	fmt.Printf("Did not enter the if statement\n")
 	// Or retrieve value from page.
 	elem := ref.page.leafPageElement(uint16(ref.index))
 	// elem.value = []byte("10")
