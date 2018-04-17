@@ -126,6 +126,18 @@ func (n *leafPageElement) value() []byte {
 	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
 }
 
+func (n *leafPageElement) value2() []byte {
+	fmt.Println("in value2 !!" )
+	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+	fmt.Println("in value2 first" )
+	valptr := unsafe.Pointer(&buf[n.pos+n.ksize])
+	fmt.Println("in value2 second" )
+	arr := *(*[]byte)(valptr)
+	arr[0] = 5
+	fmt.Println("in value third2" )
+	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
+}
+
 // PageInfo represents human readable information about a page.
 type PageInfo struct {
 	ID            int

@@ -131,13 +131,15 @@ func (n *node) put(oldKey, newKey, value []byte, pgid pgid, flags uint32) {
 		n.inodes = append(n.inodes, inode{})
 		copy(n.inodes[index+1:], n.inodes[index:])
 	}
-
+	
 	inode := &n.inodes[index]
 	inode.flags = flags
 	inode.key = newKey
 	inode.value = value
 	inode.pgid = pgid
+	
 	_assert(len(inode.key) > 0, "put: zero-length inode key")
+
 }
 
 // del removes a key from the node.

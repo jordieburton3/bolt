@@ -392,10 +392,10 @@ func (c *Cursor) keyValue2() ([]byte, []byte, uint32) {
 	fmt.Printf("Did not enter the if statement\n")
 	// Or retrieve value from page.
 	elem := ref.page.leafPageElement(uint16(ref.index))
-	fmt.Printf("Elem value: %d, using method: %d\n", elem.value(), elem.value())
+	fmt.Printf("Elem value: %d, using method: %d\n", elem.value2(), elem.value())
 	fmt.Println(reflect.TypeOf(elem.value))
 	// elem.value = []byte("10")
-	return elem.key(), elem.value(), elem.flags
+	return elem.key(), elem.value2(), elem.flags
 }
 
 // node returns the node that the cursor is currently positioned on.
