@@ -112,6 +112,15 @@ func (n *node) prevSibling() *node {
 	return n.parent.childAt(index - 1)
 }
 
+// directly changes value 
+//func (n *leafPageElement) setvalue(newval ) {
+//	fmt.Println("in seeeetvalue2 !!" )
+//	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+//	val := (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
+//	val[:][0] = newval
+	//return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
+//}
+
 // put inserts a key/value.
 func (n *node) put(oldKey, newKey, value []byte, pgid pgid, flags uint32) {
 	if pgid >= n.bucket.tx.meta.pgid {
@@ -136,11 +145,20 @@ func (n *node) put(oldKey, newKey, value []byte, pgid pgid, flags uint32) {
 	inode.flags = flags
 	inode.key = newKey
 	inode.value = value
+	//setvalue(value)
 	inode.pgid = pgid
+
+	//directly changes value 
+	fmt.Println("in seeeetvalue2 !!" )
+	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+	val := (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
+	val[:][0] = value
+	//return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
 	
 	_assert(len(inode.key) > 0, "put: zero-length inode key")
-
 }
+
+
 
 // del removes a key from the node.
 func (n *node) del(key []byte) {

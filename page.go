@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 	"unsafe"
+	"reflect"
 )
 
 const pageHeaderSize = int(unsafe.Offsetof(((*page)(nil)).ptr))
@@ -129,11 +130,14 @@ func (n *leafPageElement) value() []byte {
 func (n *leafPageElement) value2() []byte {
 	fmt.Println("in value2 !!" )
 	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
-	fmt.Println("in value2 first" )
-	valptr := unsafe.Pointer(&buf[n.pos+n.ksize])
-	fmt.Println("in value2 second" )
-	arr := *(*[]byte)(valptr)
-	arr[0] = 5
+	fmt.Println(reflect.TypeOf(buf))
+	//valptr := unsafe.Pointer(&buf[n.pos+n.ksize])
+	//arr := *(*[]byte)(valptr)
+	fmt.Println(reflect.TypeOf(10))
+	//arr = []byte("5")
+	val := (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
+	val[:][0] = 10
+
 	fmt.Println("in value third2" )
 	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
 }
