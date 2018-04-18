@@ -264,7 +264,9 @@ func (b *Bucket) DeleteBucket(key []byte) error {
 // Returns a nil value if the key does not exist or if the key is a nested bucket.
 // The returned value is only valid for the life of the transaction.
 func (b *Bucket) Get(key []byte) []byte {
-	k, v, flags := b.Cursor().seek2(key)
+	//call b.Cursor().seek2(key) if want to directly write from here
+	//k, v, flags := b.Cursor().seek2(key)
+	k, v, flags := b.Cursor().seek(key)
 
 	// Return nil if this is a bucket.
 	if (flags & bucketLeafFlag) != 0 {
@@ -297,7 +299,10 @@ func (b *Bucket) Put(key []byte, value []byte) error {
 
 	// Move cursor to correct position.
 	c := b.Cursor()
-	k, _, flags := c.seek(key)
+	//write directly use line
+	k, _, flags := c.seek3(key,value)
+	//k, _, flags := c.seek(key)
+
 
 	// Return an error if there is an existing key with a bucket value.
 	if bytes.Equal(key, k) && (flags&bucketLeafFlag) != 0 {
@@ -305,8 +310,8 @@ func (b *Bucket) Put(key []byte, value []byte) error {
 	}
 
 	// Insert into node.
-	key = cloneBytes(key)
-	c.node().put(key, key, value, 0, 0)
+	//key = cloneBytes(key)
+	//c.node().put(key, key, value, 0, 0)
 
 	return nil
 }

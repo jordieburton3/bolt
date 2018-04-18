@@ -128,6 +128,8 @@ func (n *leafPageElement) value() []byte {
 }
 
 func (n *leafPageElement) value2() []byte {
+	//used for testing purposes
+	//called in bucket.Get function and directly modifies a value though a read 
 	fmt.Println("in value2 !!" )
 	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
 	fmt.Println(reflect.TypeOf(buf))
@@ -137,10 +139,21 @@ func (n *leafPageElement) value2() []byte {
 	//arr = []byte("5")
 	val := (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
 	val[:][0] = 10
-
 	fmt.Println("in value third2" )
 	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
 }
+
+// directly changes value 
+func (n *leafPageElement) value3(newval []byte) []byte {
+	//fmt.Println("in seeeetvalue2 !!" )
+	//fmt.Println("this is int %d", newval[0])
+	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
+	val := (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
+	val[:][0] = newval[0]
+	return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
+}
+
+
 
 // PageInfo represents human readable information about a page.
 type PageInfo struct {

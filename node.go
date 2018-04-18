@@ -145,15 +145,7 @@ func (n *node) put(oldKey, newKey, value []byte, pgid pgid, flags uint32) {
 	inode.flags = flags
 	inode.key = newKey
 	inode.value = value
-	//setvalue(value)
 	inode.pgid = pgid
-
-	//directly changes value 
-	fmt.Println("in seeeetvalue2 !!" )
-	buf := (*[maxAllocSize]byte)(unsafe.Pointer(n))
-	val := (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
-	val[:][0] = value
-	//return (*[maxAllocSize]byte)(unsafe.Pointer(&buf[n.pos+n.ksize]))[:n.vsize:n.vsize]
 	
 	_assert(len(inode.key) > 0, "put: zero-length inode key")
 }

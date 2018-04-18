@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"sort"
-	"reflect"
+	//"reflect"
 )
 
 // Cursor represents an iterator that can traverse over all key/value pairs in a bucket in sorted order.
@@ -186,6 +186,23 @@ func (c *Cursor) seek2(seek []byte) (key []byte, value []byte, flags uint32) {
 
 	// If this is a bucket then return a nil value.
 	return c.keyValue2()
+}
+
+func (c *Cursor) seek3(seek []byte, val []byte) (key []byte, value []byte, flags uint32) {
+	_assert(c.bucket.tx.db != nil, "tx closed")
+	//fmt.Println("In seek3")
+	// Start from root page/node and traverse to correct page.
+	c.stack = c.stack[:0]
+	c.search(seek, c.bucket.root)
+	ref := &c.stack[len(c.stack)-1]
+
+	// If the cursor is pointing to the end of page/node then return nil.
+	if ref.index >= ref.count() {
+		//fmt.Println("returning nothing in seek3")
+		return nil, nil, 0
+	}
+	// If this is a bucket then return a nil value.
+	return c.keyValue3(val)
 }
 
 // first moves the cursor to the first leaf element under the last page in the stack.
@@ -376,7 +393,7 @@ func (c *Cursor) keyValue() ([]byte, []byte, uint32) {
 
 // keyValue returns the key and value of the current leaf element.
 func (c *Cursor) keyValue2() ([]byte, []byte, uint32) {
-	fmt.Printf("Entering keyValue2\n")
+	//fmt.Printf("Entering keyValue2\n")
 	ref := &c.stack[len(c.stack)-1]
 	if ref.count() == 0 || ref.index >= ref.count() {
 		return nil, nil, 0
@@ -389,13 +406,30 @@ func (c *Cursor) keyValue2() ([]byte, []byte, uint32) {
 		inode.value = []byte("10")
 		return inode.key, inode.value, inode.flags
 	}
-	fmt.Printf("Did not enter the if statement\n")
+	//fmt.Printf("Did not enter the if statement\n")
 	// Or retrieve value from page.
 	elem := ref.page.leafPageElement(uint16(ref.index))
-	fmt.Printf("Elem value: %d, using method: %d\n", elem.value2(), elem.value())
-	fmt.Println(reflect.TypeOf(elem.value))
-	// elem.value = []byte("10")
+	//fmt.Printf("Elem value: %d, using method: %d\n", elem.value2(), elem.value())
+	//fmt.Println(reflect.TypeOf(elem.value))
 	return elem.key(), elem.value2(), elem.flags
+}
+
+func (c *Cursor) keyValue3(val []byte) ([]byte, []byte, uint32) {
+	ref := &c.stack[len(c.stack)-1]
+	if ref.count() == 0 || ref.index >= ref.count() {
+		return nil, nil, 0
+	}
+
+	// Retrieve value from node.
+	if ref.node != nil {
+		inode := &ref.node.inodes[ref.index]
+		fmt.Println("in if statement")
+		return inode.key, inode.value, inode.flags
+	}
+	//fmt.Println("In keyValue3")
+	// Or retrieve value from page.
+	elem := ref.page.leafPageElement(uint16(ref.index))
+	return elem.key(), elem.value3(val), elem.flags
 }
 
 // node returns the node that the cursor is currently positioned on.
